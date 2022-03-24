@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello DefaultController!{% endblock %}
+
+{% block body %}
+<style>
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+</style>
+
+<div class="example-wrapper">
+    <h1>Hello {{ controller_name }}! ✅</h1>
+
+    This friendly message is coming from:
+    <ul>
+        <li>Your controller at <code><a href="{{ '/var/www/web/src/Controller/DefaultController.php'|file_link(0) }}">src/Controller/DefaultController.php</a></code></li>
+        <li>Your template at <code><a href="{{ '/var/www/web/templates/default/index.html.twig'|file_link(0) }}">templates/default/index.html.twig</a></code></li>
+    </ul>
+
+
+    {% for contribution in contributions %}
+        <h2>contribution : {{ contribution.id }}</h2>
+        <p><b>technos</b>:</p>
+        {% for techno in contribution.technos %}
+            <p>techno: {{ techno.name }}</p>
+        {% endfor %}   
+        <p><b>projets</b>:</p>
+        {% for project in contribution.projects %}
+            <p>projet: {{ project.name }}</p>
+        {% endfor %} 
+        <p><b>membres</b>:</p>        
+        {% for member in contribution.members %}
+            <p>member: {{ member.firstName }} {{ member.lastName }} {{ member.email }}</p>
+        {% endfor %} 
+    {% endfor %}    
+</div>
+{% endblock %}

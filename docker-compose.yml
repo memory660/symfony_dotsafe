@@ -1,0 +1,51 @@
+version: '3.9'
+
+services:
+
+  mariadb:
+    image: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: dbapi1
+    networks:
+      - dev
+
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    depends_on:
+      - mariadb
+    ports:
+      - 8010:80
+    environment:
+      PMA_HOST: mariadb
+    networks:
+      - dev
+
+  www1:
+    build: dockerapi
+    container_name: docker_symfony_api
+    restart: always
+    ports:
+      - 8001:80
+    volumes:
+      - ./dockerapi/vhosts:/etc/apache2/sites-enabled
+      - ./:/var/www
+    networks:
+      - dev
+
+  www2:
+    build: dockerweb
+    container_name: docker_symfony_web
+    restart: always
+    ports:
+      - 8002:80
+    volumes:
+      - ./dockerweb/vhosts:/etc/apache2/sites-enabled
+      - ./:/var/www
+    networks:
+      - dev      
+      
+networks:
+  dev:      
