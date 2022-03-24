@@ -1,0 +1,64 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Contribution index{% endblock %}
+
+{% block body %}
+    <h1>Contribution index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th></th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for contribution in contributions %}
+            <tr>
+                <td>
+                    <table class="table">
+                        <thead>
+                        <tr>
+                        <th>Id</th>
+                        <th>technos</th>
+                        <th>projets</th>
+                        <th>membres</th>
+                        </tr>
+                        <thead>
+                        <tbody>
+                        <td>
+                            {{ contribution.id }}
+                        </td>
+                        <td>
+                            {% for techno in contribution.projects %}
+                                <p>{{ techno.name }}</p>
+                            {% endfor %}    
+                        </td>
+                        <td>
+                            {% for techno in contribution.technos %}
+                                <p>{{ techno.name }}</p>
+                            {% endfor %}    
+                        </td>
+                        <td>
+                            {% for member in contribution.members %}
+                                <p>{{ member.firstname }} {{ member.lastname }} {{ member.email }}</p>
+                            {% endfor %}    
+                        </td>   
+                        </tbody>                                             
+                    </table>
+                </td>
+                <td>
+                    <a href="{{ path('app_contribution_show', {'id': contribution.id}) }}">show</a>
+                    <a href="{{ path('app_contribution_edit', {'id': contribution.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="2">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_contribution_new') }}">Create new</a>
+{% endblock %}

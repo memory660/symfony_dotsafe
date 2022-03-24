@@ -4,8 +4,6 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\MemberRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: MemberRepository::class)]
@@ -18,25 +16,32 @@ class Member
     private $id;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $firstname;
+    private $lastname;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $Lastname;
+    private $firstname;
 
     #[ORM\Column(type: 'string', length: 255)]
     private $email;
 
-    #[ORM\ManyToMany(targetEntity: Contribution::class, mappedBy: 'members')]
-    private $contributions;
-
-    public function __construct()
-    {
-        $this->contributions = new ArrayCollection();
-    }
+    #[ORM\ManyToOne(targetEntity: Contribution::class, inversedBy: 'member')]
+    private $contribution;
 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getLastname(): ?string
+    {
+        return $this->lastname;
+    }
+
+    public function setLastname(string $lastname): self
+    {
+        $this->lastname = $lastname;
+
+        return $this;
     }
 
     public function getFirstname(): ?string
@@ -47,18 +52,6 @@ class Member
     public function setFirstname(string $firstname): self
     {
         $this->firstname = $firstname;
-
-        return $this;
-    }
-
-    public function getLastname(): ?string
-    {
-        return $this->Lastname;
-    }
-
-    public function setLastname(string $Lastname): self
-    {
-        $this->Lastname = $Lastname;
 
         return $this;
     }
@@ -75,35 +68,15 @@ class Member
         return $this;
     }
 
-    /**
-     * @return Collection<int, Contribution>
-     */
-    public function getContributions(): Collection
+    public function getContribution(): ?Contribution
     {
-        return $this->contributions;
+        return $this->contribution;
     }
 
-    public function addContribution(Contribution $contribution): self
+    public function setContribution(?Contribution $contribution): self
     {
-        if (!$this->contributions->contains($contribution)) {
-            $this->contributions[] = $contribution;
-            $contribution->addMember($this);
-        }
+        $this->contribution = $contribution;
 
         return $this;
     }
-
-    public function removeContribution(Contribution $contribution): self
-    {
-        if ($this->contributions->removeElement($contribution)) {
-            $contribution->removeMember($this);
-        }
-
-        return $this;
-    }
-
-    public function __toString(): string
-    {
-        return $this->getFirstname() . ' ' . $this->getLastname();  
-    }        
 }

@@ -13,6 +13,10 @@ php namespace resolvers
 twig langage 2
 ```
 
+## erreur undefined VS CODE
+
+F1   developper:reload  window
+
 ## config
 
 ```
@@ -37,7 +41,8 @@ php bin/console doctrine:schema:create
 php -S 127.0.0.1:8000 -t public
 https://localhost/docs/
 
-php bin/console make:entity --api-resource
+composer require --dev symfony/maker-bundle
+php bin/console make:entity --api-resource 
 php bin/console make:crud 
 php bin/console make:controller
 
@@ -58,6 +63,14 @@ openssl genrsa -out private.pem 4096
 openssl rsa -in mykey.pem -pubout -out public.pem
 ```
 
+```
+composer require ramsey/uuid-doctrine
+```
+
+```
+    #[ApiSubresource()]    
+
+```
 
 # entity
 

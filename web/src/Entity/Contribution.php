@@ -7,7 +7,6 @@ use App\Repository\ContributionRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: ContributionRepository::class)]
 #[ApiResource]
@@ -18,20 +17,20 @@ class Contribution
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[ORM\ManyToMany(targetEntity: Techno::class, inversedBy: 'contributions')]  
-    private $technos;
+    #[ORM\OneToMany(mappedBy: 'contribution', targetEntity: Techno::class)]
+    private $techno;
 
-    #[ORM\ManyToMany(targetEntity: Project::class, inversedBy: 'contributions')]  
-    private $projects;
+    #[ORM\OneToMany(mappedBy: 'contribution', targetEntity: Project::class)]
+    private $project;
 
-    #[ORM\ManyToMany(targetEntity: Member::class, inversedBy: 'contributions')]
-    private $members;
+    #[ORM\OneToMany(mappedBy: 'contribution', targetEntity: Member::class)]
+    private $member;
 
     public function __construct()
     {
-        $this->technos = new ArrayCollection();
-        $this->projects = new ArrayCollection();
-        $this->members = new ArrayCollection();
+        $this->techno = new ArrayCollection();
+        $this->project = new ArrayCollection();
+        $this->member = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -42,15 +41,16 @@ class Contribution
     /**
      * @return Collection<int, Techno>
      */
-    public function getTechnos(): Collection
+    public function getTechno(): Collection
     {
-        return $this->technos;
+        return $this->techno;
     }
 
     public function addTechno(Techno $techno): self
     {
-        if (!$this->technos->contains($techno)) {
-            $this->technos[] = $techno;
+        if (!$this->techno->contains($techno)) {
+            $this->techno[] = $techno;
+            $techno->setContribution($this);
         }
 
         return $this;
@@ -58,7 +58,12 @@ class Contribution
 
     public function removeTechno(Techno $techno): self
     {
-        $this->technos->removeElement($techno);
+        if ($this->techno->removeElement($techno)) {
+            // set the owning side to null (unless already changed)
+            if ($techno->getContribution() === $this) {
+                $techno->setContribution(null);
+            }
+        }
 
         return $this;
     }
@@ -66,15 +71,16 @@ class Contribution
     /**
      * @return Collection<int, Project>
      */
-    public function getProjects(): Collection
+    public function getProject(): Collection
     {
-        return $this->projects;
+        return $this->project;
     }
 
     public function addProject(Project $project): self
     {
-        if (!$this->projects->contains($project)) {
-            $this->projects[] = $project;
+        if (!$this->project->contains($project)) {
+            $this->project[] = $project;
+            $project->setContribution($this);
         }
 
         return $this;
@@ -82,7 +88,12 @@ class Contribution
 
     public function removeProject(Project $project): self
     {
-        $this->projects->removeElement($project);
+        if ($this->project->removeElement($project)) {
+            // set the owning side to null (unless already changed)
+            if ($project->getContribution() === $this) {
+                $project->setContribution(null);
+            }
+        }
 
         return $this;
     }
@@ -90,15 +101,16 @@ class Contribution
     /**
      * @return Collection<int, Member>
      */
-    public function getMembers(): Collection
+    public function getMember(): Collection
     {
-        return $this->members;
+        return $this->member;
     }
 
     public function addMember(Member $member): self
     {
-        if (!$this->members->contains($member)) {
-            $this->members[] = $member;
+        if (!$this->member->contains($member)) {
+            $this->member[] = $member;
+            $member->setContribution($this);
         }
 
         return $this;
@@ -106,13 +118,13 @@ class Contribution
 
     public function removeMember(Member $member): self
     {
-        $this->members->removeElement($member);
+        if ($this->member->removeElement($member)) {
+            // set the owning side to null (unless already changed)
+            if ($member->getContribution() === $this) {
+                $member->setContribution(null);
+            }
+        }
 
         return $this;
     }
-
-    public function __toString(): string
-    {
-        return $this->getId();  
-    }       
 }

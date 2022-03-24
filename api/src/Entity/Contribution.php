@@ -2,110 +2,88 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
 use App\Repository\ContributionRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Ramsey\Uuid\Doctrine\UuidGenerator\UuidOrderedTimeGenerator;
 
 #[ORM\Entity(repositoryClass: ContributionRepository::class)]
-#[ApiResource]
+#[ApiResource(
+  //  normalizationContext: ['groups' => ['Contribution:read']],
+  //  denormalizationContext: ['groups' => ['Contribution:write']],    
+)]
 class Contribution
 {
+
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
-    private $id;
+    #[ORM\Column(type:"uuid", unique:true)]
+    #[ORM\GeneratedValue(strategy: "CUSTOM")]
+    #[ORM\CustomIdGenerator(class: "App\Util\Doctrine\UuidIdGenerator")]
+    protected $id;
 
-    #[ORM\ManyToMany(targetEntity: Techno::class, inversedBy: 'contributions')]
-    private $technos;
+    #[ORM\ManyToOne(targetEntity: Techno::class, inversedBy: 'contributions')]
+    //#[Groups(["Contribution:read", "Contribution:write"])]  
+    #[ApiProperty(identifier: true)]    
+    //#[ApiSubresource()]         
+    private $techno;
 
-    #[ORM\ManyToMany(targetEntity: Project::class, inversedBy: 'contributions')]
-    private $projects;
+    #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'contributions')]
+    //#[Groups(["Contribution:read", "Contribution:write"])]       
+    #[ApiProperty(identifier: true)]     
+    //#[ApiSubresource()]          
+    private $project;
 
-    #[ORM\ManyToMany(targetEntity: Member::class, inversedBy: 'contributions')]
-    private $members;
+    #[ORM\ManyToOne(targetEntity: Member::class, inversedBy: 'contributions')]
+    //#[Groups(["Contribution:read", "Contribution:write"])]      
+    #[ApiProperty(identifier: true)]     
+    //#[ApiSubresource()]            
+    private $member;
 
-    public function __construct()
+    public function __construct($id = null)
     {
-        $this->technos = new ArrayCollection();
-        $this->projects = new ArrayCollection();
-        $this->members = new ArrayCollection();
+        $this->id = $id;
     }
 
-    public function getId(): ?int
+    public function getId(): ?string
     {
         return $this->id;
     }
 
-    /**
-     * @return Collection<int, Techno>
-     */
-    public function getTechnos(): Collection
+    public function getTechno(): ?Techno
     {
-        return $this->technos;
+        return $this->techno;
     }
 
-    public function addTechno(Techno $techno): self
+    public function setTechno(?Techno $techno): self
     {
-        if (!$this->technos->contains($techno)) {
-            $this->technos[] = $techno;
-        }
+        $this->techno = $techno;
 
         return $this;
     }
 
-    public function removeTechno(Techno $techno): self
+    public function getProject(): ?Project
     {
-        $this->technos->removeElement($techno);
+        return $this->project;
+    }
+
+    public function setProject(?Project $project): self
+    {
+        $this->project = $project;
 
         return $this;
     }
 
-    /**
-     * @return Collection<int, Project>
-     */
-    public function getProjects(): Collection
+    public function getMember(): ?Member
     {
-        return $this->projects;
+        return $this->member;
     }
 
-    public function addProject(Project $project): self
+    public function setMember(?Member $member): self
     {
-        if (!$this->projects->contains($project)) {
-            $this->projects[] = $project;
-        }
-
-        return $this;
-    }
-
-    public function removeProject(Project $project): self
-    {
-        $this->projects->removeElement($project);
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Member>
-     */
-    public function getMembers(): Collection
-    {
-        return $this->members;
-    }
-
-    public function addMember(Member $member): self
-    {
-        if (!$this->members->contains($member)) {
-            $this->members[] = $member;
-        }
-
-        return $this;
-    }
-
-    public function removeMember(Member $member): self
-    {
-        $this->members->removeElement($member);
+        $this->member = $member;
 
         return $this;
     }

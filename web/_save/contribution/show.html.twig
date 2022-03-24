@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Contribution{% endblock %}
+
+{% block body %}
+    <h1>Contribution</h1>
+
+
+
+                    <table class="table">
+                        <thead>
+                        <tr>
+                        <th>Id</th>
+                        <th>technos</th>
+                        <th>projets</th>
+                        <th>membres</th>
+                        </tr>
+                        <thead>
+                        <tbody>
+                        <td>
+                            {{ contribution.id }}
+                        </td>
+                        <td>
+                            {% for techno in contribution.projects %}
+                                <p>{{ techno.name }}</p>
+                            {% endfor %}    
+                        </td>
+                        <td>
+                            {% for techno in contribution.technos %}
+                                <p>{{ techno.name }}</p>
+                            {% endfor %}    
+                        </td>
+                        <td>
+                            {% for member in contribution.members %}
+                                <p>{{ member.firstname }} {{ member.lastname }} {{ member.email }}</p>
+                            {% endfor %}    
+                        </td>   
+                        </tbody>                                             
+                    </table>
+
+
+
+
+    <a href="{{ path('app_contribution_index') }}">back to list</a>
+
+    <a href="{{ path('app_contribution_edit', {'id': contribution.id}) }}">edit</a>
+
+    {{ include('contribution/_delete_form.html.twig') }}
+{% endblock %}

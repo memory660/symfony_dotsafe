@@ -2,7 +2,9 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
 use App\Repository\TechnoRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -13,14 +15,16 @@ use Doctrine\ORM\Mapping as ORM;
 class Techno
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
-    private $id;
+    #[ORM\Column(type:"uuid", unique:true)]
+    #[ORM\GeneratedValue(strategy: "CUSTOM")]
+    #[ORM\CustomIdGenerator(class: "App\Util\Doctrine\UuidIdGenerator")]
+    protected $id;
 
     #[ORM\Column(type: 'string', length: 255)]
     private $name;
 
-    #[ORM\ManyToMany(targetEntity: Contribution::class, mappedBy: 'technos')]
+    #[ORM\OneToMany(mappedBy: 'techno', targetEntity: Contribution::class)]
+    #[ApiSubresource()]      
     private $contributions;
 
     public function __construct()
@@ -28,7 +32,7 @@ class Techno
         $this->contributions = new ArrayCollection();
     }
 
-    public function getId(): ?int
+    public function getId(): ?string
     {
         return $this->id;
     }
@@ -57,7 +61,7 @@ class Techno
     {
         if (!$this->contributions->contains($contribution)) {
             $this->contributions[] = $contribution;
-            $contribution->addTechno($this);
+            $contribution->setTechno($this);
         }
 
         return $this;
@@ -66,7 +70,10 @@ class Techno
     public function removeContribution(Contribution $contribution): self
     {
         if ($this->contributions->removeElement($contribution)) {
-            $contribution->removeTechno($this);
+            // set the owning side to null (unless already changed)
+            if ($contribution->getTechno() === $this) {
+                $contribution->setTechno(null);
+            }
         }
 
         return $this;
