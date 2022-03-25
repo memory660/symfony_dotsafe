@@ -14,11 +14,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ApiResource]
 class Techno
 {
-    #[ORM\Id]
-    #[ORM\Column(type:"uuid", unique:true)]
-    #[ORM\GeneratedValue(strategy: "CUSTOM")]
-    #[ORM\CustomIdGenerator(class: "App\Util\Doctrine\UuidIdGenerator")]
-    protected $id;
+    #[ORM\Id, ORM\Column, ORM\GeneratedValue]
+    private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 255)]
     private $name;
@@ -32,7 +29,7 @@ class Techno
         $this->contributions = new ArrayCollection();
     }
 
-    public function getId(): ?string
+    public function getId(): ?int
     {
         return $this->id;
     }

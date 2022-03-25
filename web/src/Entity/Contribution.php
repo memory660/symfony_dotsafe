@@ -2,35 +2,38 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
 use App\Repository\ContributionRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 #[ORM\Entity(repositoryClass: ContributionRepository::class)]
-#[ApiResource]
+#[ApiResource(
+  //  normalizationContext: ['groups' => ['Contribution:read']],
+  //  denormalizationContext: ['groups' => ['Contribution:write']],    
+)]
+#[ApiFilter(SearchFilter::class, properties: ['techno' => 'exact', 'project' => 'exact', 'member' => 'exact',])]   
 class Contribution
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
-    private $id;
 
-    #[ORM\OneToMany(mappedBy: 'contribution', targetEntity: Techno::class)]
+    #[ORM\Id, ORM\Column, ORM\GeneratedValue]
+    private ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: Techno::class, inversedBy: 'contributions')] 
     private $techno;
 
-    #[ORM\OneToMany(mappedBy: 'contribution', targetEntity: Project::class)]
+    #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'contributions')]        
     private $project;
 
-    #[ORM\OneToMany(mappedBy: 'contribution', targetEntity: Member::class)]
+    #[ORM\ManyToOne(targetEntity: Member::class, inversedBy: 'contributions')]             
     private $member;
 
-    public function __construct()
+    public function __construct($id = null)
     {
-        $this->techno = new ArrayCollection();
-        $this->project = new ArrayCollection();
-        $this->member = new ArrayCollection();
+        $this->id = $id;
     }
 
     public function getId(): ?int
@@ -38,92 +41,38 @@ class Contribution
         return $this->id;
     }
 
-    /**
-     * @return Collection<int, Techno>
-     */
-    public function getTechno(): Collection
+    public function getTechno(): ?Techno
     {
         return $this->techno;
     }
 
-    public function addTechno(Techno $techno): self
+    public function setTechno(?Techno $techno): self
     {
-        if (!$this->techno->contains($techno)) {
-            $this->techno[] = $techno;
-            $techno->setContribution($this);
-        }
+        $this->techno = $techno;
 
         return $this;
     }
 
-    public function removeTechno(Techno $techno): self
-    {
-        if ($this->techno->removeElement($techno)) {
-            // set the owning side to null (unless already changed)
-            if ($techno->getContribution() === $this) {
-                $techno->setContribution(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Project>
-     */
-    public function getProject(): Collection
+    public function getProject(): ?Project
     {
         return $this->project;
     }
 
-    public function addProject(Project $project): self
+    public function setProject(?Project $project): self
     {
-        if (!$this->project->contains($project)) {
-            $this->project[] = $project;
-            $project->setContribution($this);
-        }
+        $this->project = $project;
 
         return $this;
     }
 
-    public function removeProject(Project $project): self
-    {
-        if ($this->project->removeElement($project)) {
-            // set the owning side to null (unless already changed)
-            if ($project->getContribution() === $this) {
-                $project->setContribution(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Member>
-     */
-    public function getMember(): Collection
+    public function getMember(): ?Member
     {
         return $this->member;
     }
 
-    public function addMember(Member $member): self
+    public function setMember(?Member $member): self
     {
-        if (!$this->member->contains($member)) {
-            $this->member[] = $member;
-            $member->setContribution($this);
-        }
-
-        return $this;
-    }
-
-    public function removeMember(Member $member): self
-    {
-        if ($this->member->removeElement($member)) {
-            // set the owning side to null (unless already changed)
-            if ($member->getContribution() === $this) {
-                $member->setContribution(null);
-            }
-        }
+        $this->member = $member;
 
         return $this;
     }

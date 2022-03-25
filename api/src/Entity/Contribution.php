@@ -7,39 +7,28 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
 use App\Repository\ContributionRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
-use Ramsey\Uuid\Doctrine\UuidGenerator\UuidOrderedTimeGenerator;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 #[ORM\Entity(repositoryClass: ContributionRepository::class)]
 #[ApiResource(
   //  normalizationContext: ['groups' => ['Contribution:read']],
   //  denormalizationContext: ['groups' => ['Contribution:write']],    
 )]
+#[ApiFilter(SearchFilter::class, properties: ['techno' => 'exact', 'project' => 'exact', 'member' => 'exact',])]   
 class Contribution
 {
 
-    #[ORM\Id]
-    #[ORM\Column(type:"uuid", unique:true)]
-    #[ORM\GeneratedValue(strategy: "CUSTOM")]
-    #[ORM\CustomIdGenerator(class: "App\Util\Doctrine\UuidIdGenerator")]
-    protected $id;
+    #[ORM\Id, ORM\Column, ORM\GeneratedValue]
+    private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: Techno::class, inversedBy: 'contributions')]
-    //#[Groups(["Contribution:read", "Contribution:write"])]  
-    #[ApiProperty(identifier: true)]    
-    //#[ApiSubresource()]         
+    #[ORM\ManyToOne(targetEntity: Techno::class, inversedBy: 'contributions')] 
     private $techno;
 
-    #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'contributions')]
-    //#[Groups(["Contribution:read", "Contribution:write"])]       
-    #[ApiProperty(identifier: true)]     
-    //#[ApiSubresource()]          
+    #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'contributions')]        
     private $project;
 
-    #[ORM\ManyToOne(targetEntity: Member::class, inversedBy: 'contributions')]
-    //#[Groups(["Contribution:read", "Contribution:write"])]      
-    #[ApiProperty(identifier: true)]     
-    //#[ApiSubresource()]            
+    #[ORM\ManyToOne(targetEntity: Member::class, inversedBy: 'contributions')]             
     private $member;
 
     public function __construct($id = null)
@@ -47,7 +36,7 @@ class Contribution
         $this->id = $id;
     }
 
-    public function getId(): ?string
+    public function getId(): ?int
     {
         return $this->id;
     }
