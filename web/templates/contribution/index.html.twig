@@ -8,7 +8,10 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Id</th>
+                <th><b>contribution</b></th>
+                <th>projet</th>
+                <th>membre</th>  
+                <th>techno</th>                                                 
                 <th>actions</th>
             </tr>
         </thead>
@@ -16,6 +19,9 @@
         {% for contribution in contributions %}
             <tr>
                 <td>{{ contribution.id }}</td>
+                <td>{{ contribution.project }}</td>
+                <td>{{ contribution.member }}</td>
+                <td>{{ contribution.techno }}</td>                
                 <td>
                     <a href="{{ path('app_contribution_show', {'id': contribution.id}) }}">show</a>
                     <a href="{{ path('app_contribution_edit', {'id': contribution.id}) }}">edit</a>
