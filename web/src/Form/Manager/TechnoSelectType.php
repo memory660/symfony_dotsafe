@@ -18,7 +18,10 @@ dump($options['choices']);
         $builder
             ->add('techno', ChoiceType::class, [
                 'choices'  => $options['choices']['technos'],
-            ])
+   
+            ],
+   
+            )
             ->add('member', ChoiceType::class, [
                 'choices'  => $options['choices']['members'],
             ])            

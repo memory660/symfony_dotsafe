@@ -26,6 +26,8 @@ class ProjectManagerController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+            dump($form->getData());
             //$projectRepository->add($techno);
             //return $this->redirectToRoute('app_project_index', [], Response::HTTP_SEE_OTHER);
         }
