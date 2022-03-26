@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraints as Assert;
   //  normalizationContext: ['groups' => ['Contribution:read']],
   //  denormalizationContext: ['groups' => ['Contribution:write']],    
 )]
-#[ApiFilter(SearchFilter::class, properties: ['techno' => 'exact', 'project' => 'exact', 'member' => 'exact',])]   
+#[ApiFilter(SearchFilter::class, properties: ['techno' => 'exact', 'project' => 'exact', 'user' => 'exact',])]   
 class Contribution
 {
 
@@ -31,9 +31,9 @@ class Contribution
     #[Assert\NotBlank]          
     private $project;
 
-    #[ORM\ManyToOne(targetEntity: Member::class, inversedBy: 'contributions')]      
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'contributions')]      
     #[Assert\NotBlank]              
-    private $member;
+    private $user;
 
     public function __construct($id = null)
     {
@@ -69,14 +69,14 @@ class Contribution
         return $this;
     }
 
-    public function getMember(): ?Member
+    public function getUser(): ?User
     {
-        return $this->member;
+        return $this->user;
     }
 
-    public function setMember(?Member $member): self
+    public function setUser(?User $user): self
     {
-        $this->member = $member;
+        $this->user = $user;
 
         return $this;
     }

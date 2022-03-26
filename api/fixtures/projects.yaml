@@ -4,13 +4,14 @@ App\Entity\Project:
 App\Entity\Techno:
     techno_{1..6}:
         name: <name()>
-App\Entity\Member:
-    member_{1..2}:
-        firstname: <name()>    
-        lastname: <name()> 
-        email: <email()>                      
+App\Entity\User:
+    user_{1..2}:
+        username: <name()>    
+        email: <email()>    
+        roles: [ROLE_USER]
+        password: <encodePassword('222222')>                  
 App\Entity\Contribution:
     contribution_{1..20}:
         project: '@project_*'
         techno: '@techno_*'
-        member: '@member_*'    
+        user: '@user_*'    
