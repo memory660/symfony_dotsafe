@@ -9,6 +9,7 @@ use App\Repository\TechnoRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert; 
 
 #[ORM\Entity(repositoryClass: TechnoRepository::class)]
 #[ApiResource]
@@ -18,6 +19,7 @@ class Techno
     private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\NotBlank]
     private $name;
 
     #[ORM\OneToMany(mappedBy: 'techno', targetEntity: Contribution::class)]

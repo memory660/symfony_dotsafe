@@ -9,6 +9,7 @@ use App\Repository\ContributionRepository;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use Symfony\Component\Validator\Constraints as Assert; 
 
 #[ORM\Entity(repositoryClass: ContributionRepository::class)]
 #[ApiResource(
@@ -23,12 +24,15 @@ class Contribution
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: Techno::class, inversedBy: 'contributions')] 
+    #[Assert\NotBlank]       
     private $techno;
 
-    #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'contributions')]        
+    #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'contributions')]     
+    #[Assert\NotBlank]          
     private $project;
 
-    #[ORM\ManyToOne(targetEntity: Member::class, inversedBy: 'contributions')]             
+    #[ORM\ManyToOne(targetEntity: Member::class, inversedBy: 'contributions')]      
+    #[Assert\NotBlank]              
     private $member;
 
     public function __construct($id = null)
