@@ -28,4 +28,7 @@ services:
         arguments: ['@.inner']
 
     App\DataFixtures\Providers\EncodePasswordProvider: 
-        tags: [ { name: nelmio_alice.faker.provider } ]         
+        tags: [ { name: nelmio_alice.faker.provider } ]
+
+#    Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface:
+#        public: true   

@@ -5,6 +5,7 @@ namespace App\Tests;
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\Test\ApiTestCase;
 use App\Entity\Project;
+use App\Entity\User;
 use Hautelook\AliceBundle\PhpUnit\RefreshDatabaseTrait;
 
 class ProjectTest extends ApiTestCase
@@ -12,10 +13,57 @@ class ProjectTest extends ApiTestCase
     // Ce trait fourni par AliceBundle se chargera de rafraîchir le contenu de la base de données à un état connu avant chaque test.
     use RefreshDatabaseTrait;
 
+    protected static $initialized = FALSE;
+    protected static $token;
+
+    public function setUp(): void {
+        if (!self::$initialized) {        
+dump('--- setUp() -----')        ;
+
+
+        static::bootKernel();
+        $container = self::$kernel->getContainer();
+        $client = static::createClient();
+
+        $user = new User();
+        $user->setUsername('test');
+        $user->setEmail('test@test.fr');
+        $user->setRoles(["ROLE_USER"]);        
+        $user->setPassword(
+            //$container->get(UserPasswordEncoderInterface::class)->hashPassword($user, '$3CR3T')
+            '$2y$04$s41UfqOEkYc66BldbxBg0uSNFvbZD1VH1bZTrqIim6WzDLnPaRPFO'
+        );
+
+        $manager = $container->get('doctrine')->getManager();
+        $manager->persist($user);
+        $manager->flush();
+
+        // retrieve a token
+        $response = $client->request('POST', 'http://localhost:8001/authentication_token', [
+            'headers' => ['Content-Type' => 'application/json'],
+            'json' => [
+                'email' => 'test@test.fr',
+                'password' => 'test22',
+            ],
+        ]);
+
+        $json = $response->toArray();
+        self::$token = $json['token'];
+        self::$initialized = TRUE;
+    }
+    }
+
+// ['auth_bearer' => $json['token']];
+
     public function testGetCollection(): void
     {
+        //
+        //
+        //
+        dump('------------------------------');
+        dump(self::$token);
         // Le client implémente la `HttpClientInterface` de Symfony, et la réponse la `ResponseInterface`.
-        $response = static::createClient()->request('GET', '/api/projects');
+        $response = static::createClient()->request('GET', '/api/projects', ['auth_bearer' => self::$token]);
 
         $this->assertResponseIsSuccessful();
         // Indique que le type de contenu renvoyé est JSON-LD (par défaut).
@@ -46,8 +94,14 @@ class ProjectTest extends ApiTestCase
 
     public function testCreateProject(): void
     {
+        dump('------------------------------');
+        dump(self::$token);        
+        //$this->initToken();
+        //
+        //
         $response = static::createClient()->request('POST', '/api/projects', ['json' => [
             'name' => 'projet no1',
+            'auth_bearer' => self::$token            
         ]]);
 
         $this->assertResponseStatusCodeSame(201);
@@ -63,8 +117,14 @@ class ProjectTest extends ApiTestCase
 
     public function testCreateInvalidProject(): void
     {
+        dump('------------------------------');
+        dump(self::$token);        
+        //$this->initToken();
+        //
+        //        
         static::createClient()->request('POST', '/api/projects', ['json' => [
             'name' => '',
+            'auth_bearer' => self::$token  
         ]]);
 
         $this->assertResponseStatusCodeSame(422);
@@ -80,17 +140,24 @@ class ProjectTest extends ApiTestCase
 
     public function testUpdateProject(): void
     {
+        dump('------------------------------');
+        dump(self::$token);        
+        //$this->initToken();
+        //
+        //        
         $client = static::createClient();
         static::createClient()->request('POST', '/api/projects', ['json' => [
             'name' => 'projet no1',
+            'auth_bearer' => self::$token  
         ]]);        
         // findIriBy permet de récupérer l'IRI d'un élément en recherchant certaines de ses propriétés.
         // L'ISBN 9786644879585 a été généré par Alice lors du chargement des montages de test.
         // Comme Alice utilise un générateur de nombres pseudo-aléatoires ensemencé, nous sommes sûrs que cet ISBN sera toujours généré.
-        $iri = $this->findIriBy(Project::class, ['name' => 'projet no1']);
+        $iri = static::findIriBy(Project::class, ['name' => 'projet no1']);
 
         $client->request('PUT', $iri, ['json' => [
             'name' => 'updated name',
+            'auth_bearer' => self::$token  
         ]]);
 
         $this->assertResponseIsSuccessful();
@@ -102,12 +169,18 @@ class ProjectTest extends ApiTestCase
 
     public function testDeleteProject(): void
     {
+        dump('------------------------------');
+        dump(self::$token);        
+        //$this->initToken();
+        //
+        //        
         $client = static::createClient();
         static::createClient()->request('POST', '/api/projects', ['json' => [
             'name' => 'projet no2',
+            'auth_bearer' => self::$token  
         ]]); 
 
-        $iri = $this->findIriBy(Project::class, ['name' => 'projet no2']);
+        $iri = static::findIriBy(Project::class, ['name' => 'projet no2']);
 
         $client->request('DELETE', $iri);
 
